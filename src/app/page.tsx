@@ -32,7 +32,7 @@ export default function Home() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/categories');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories`);
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -45,8 +45,8 @@ export default function Home() {
     const fetchProperties = async () => {
       try {
         const url = activeCategoryId
-          ? `http://localhost:3000/properties?categoryId=${activeCategoryId}`
-          : 'http://localhost:3000/properties';
+          ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/properties?categoryId=${activeCategoryId}`
+          : `${process.env.NEXT_PUBLIC_API_BASE_URL}/properties`;
         const response = await axios.get(url);
         setProperties(response.data);
       } catch (error) {
