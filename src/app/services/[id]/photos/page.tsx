@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, X, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { ChevronLeft, ChevronRight, X, ArrowLeft, Share2, Heart, Bed, Sofa, Utensils, Bath, Home, Grid } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 const PHOTO_SECTIONS = [
     {
         id: 'exterior',
         title: 'Exterior',
+        icon: <Home size={18} />,
         photos: [
             'https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2070&auto=format&fit=crop',
@@ -18,6 +18,7 @@ const PHOTO_SECTIONS = [
     {
         id: 'kitchen',
         title: 'Kitchen',
+        icon: <Utensils size={18} />,
         photos: [
             'https://images.unsplash.com/photo-1556911261-6bd341186b2f?q=80&w=2070&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1556911261-6bd341186b2f?q=80&w=2070&auto=format&fit=crop',
@@ -27,6 +28,7 @@ const PHOTO_SECTIONS = [
     {
         id: 'living',
         title: 'Living area',
+        icon: <Sofa size={18} />,
         photos: [
             'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?q=80&w=1974&auto=format&fit=crop',
@@ -36,6 +38,7 @@ const PHOTO_SECTIONS = [
     {
         id: 'bedroom',
         title: 'Bedroom',
+        icon: <Bed size={18} />,
         photos: [
             'https://images.unsplash.com/photo-1560185127-6ed189bf02f4?q=80&w=2070&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?q=80&w=2073&auto=format&fit=crop',
@@ -45,6 +48,7 @@ const PHOTO_SECTIONS = [
     {
         id: 'bathroom',
         title: 'Full bathroom',
+        icon: <Bath size={18} />,
         photos: [
             'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=2070&auto=format&fit=crop',
             'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?q=80&w=1974&auto=format&fit=crop'
@@ -60,9 +64,9 @@ export default function PhotoTourPage() {
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
     const [activeSection, setActiveSection] = useState('exterior');
 
-    // Intersection Observer to update active section on scroll
     useEffect(() => {
         const observers: IntersectionObserver[] = [];
+        const container = document.getElementById('photo-scroll-container');
 
         PHOTO_SECTIONS.forEach((section) => {
             const observer = new IntersectionObserver(
@@ -71,7 +75,11 @@ export default function PhotoTourPage() {
                         setActiveSection(section.id);
                     }
                 },
-                { threshold: 0.5, rootMargin: '-100px 0px -50% 0px' }
+                {
+                    threshold: 0.2,
+                    root: container,
+                    rootMargin: '-80px 0px -50% 0px'
+                }
             );
 
             const element = document.getElementById(section.id);
@@ -85,17 +93,12 @@ export default function PhotoTourPage() {
     }, []);
 
     const scrollToSection = (sectionId: string) => {
-        setActiveSection(sectionId); // Immediate feedback
+        setActiveSection(sectionId);
         const element = document.getElementById(sectionId);
-        if (element) {
-            const offset = 100; // Account for sticky header
-            const bodyRect = document.body.getBoundingClientRect().top;
-            const elementRect = element.getBoundingClientRect().top;
-            const elementPosition = elementRect - bodyRect;
-            const offsetPosition = elementPosition - offset;
-
-            window.scrollTo({
-                top: offsetPosition,
+        const container = document.getElementById('photo-scroll-container');
+        if (element && container) {
+            container.scrollTo({
+                top: element.offsetTop - 0,
                 behavior: 'smooth'
             });
         }
@@ -127,126 +130,145 @@ export default function PhotoTourPage() {
     }, [selectedPhotoIndex]);
 
     return (
-        <div style={{ backgroundColor: 'white', minHeight: '100vh', color: 'var(--slate-900)' }}>
-            {/* Header / Nav */}
-            <div style={{
-                position: 'sticky',
+        <div style={{ backgroundColor: 'white', minHeight: '100vh', color: '#222222' }}>
+            {/* Fixed Header */}
+            <header style={{
+                position: 'fixed',
                 top: 0,
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(8px)',
-                zIndex: 100,
-                borderBottom: '1px solid var(--slate-100)',
-                padding: '0 24px'
+                left: 0,
+                right: 0,
+                height: '64px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0 24px',
+                backgroundColor: 'white',
+                borderBottom: '1px solid #DDDDDD',
+                zIndex: 1000,
+                boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
             }}>
-                <div className="container" style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    height: '80px',
-                    justifyContent: 'space-between'
-                }}>
-                    <button
-                        onClick={() => router.back()}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            background: 'none',
-                            border: 'none',
-                            cursor: 'pointer',
-                            padding: '8px',
-                            borderRadius: '50%',
-                            transition: 'background 0.2s'
-                        }}
-                        className="hover-bg-slate-100"
-                    >
-                        <ArrowLeft size={20} />
+                <button
+                    onClick={() => router.back()}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        cursor: 'pointer'
+                    }}
+                    className="hover-bg-f7"
+                >
+                    <X size={20} />
+                </button>
+
+                <div style={{ display: 'flex', gap: '16px' }}>
+                    <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, textDecoration: 'underline' }}>
+                        <Share2 size={16} /> <span className="desktop-only">Share</span>
                     </button>
-
-                    <div style={{ display: 'flex', gap: '24px', overflowX: 'auto', paddingBottom: '4px' }}>
-                        {PHOTO_SECTIONS.map((section) => (
-                            <button
-                                key={section.id}
-                                onClick={() => scrollToSection(section.id)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: '8px 4px',
-                                    fontSize: '14px',
-                                    fontWeight: 600,
-                                    color: activeSection === section.id ? 'var(--slate-900)' : 'var(--gray)',
-                                    cursor: 'pointer',
-                                    borderBottom: activeSection === section.id ? '2px solid var(--slate-900)' : '2px solid transparent',
-                                    whiteSpace: 'nowrap',
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                {section.title}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div style={{ width: '40px' }} /> {/* Spacer */}
+                    <button style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '14px', fontWeight: 600, textDecoration: 'underline' }}>
+                        <Heart size={16} /> <span className="desktop-only">Save</span>
+                    </button>
                 </div>
-            </div>
+            </header>
 
-            {/* Content */}
-            <div className="container" style={{ paddingTop: '2rem', paddingBottom: '5rem' }}>
-                <h1 className="luxury-text-display" style={{ fontSize: '2.5rem', marginBottom: '3rem' }}>
-                    Photo tour
-                </h1>
+            <main style={{ display: 'flex', justifyContent: 'center', paddingTop: '64px', height: 'calc(100vh - 64px)' }}>
+                {/* Right Content: Grouped Photos */}
+                <div
+                    id="photo-scroll-container"
+                    style={{
+                        width: '100%',
+                        maxWidth: '850px',
+                        overflowY: 'auto',
+                        padding: '40px 0',
+                        scrollBehavior: 'smooth',
+                        backgroundColor: 'white'
+                    }}
+                >
+                    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 24px' }}>
+                        {/* Photo Tour Title Section */}
+                        <div style={{ marginBottom: '40px' }}>
+                            <h1 style={{ fontSize: '32px', fontWeight: 600, color: '#222222', marginBottom: '24px' }}>Photo tour</h1>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem' }}>
-                    {PHOTO_SECTIONS.map((section, sIdx) => {
-                        // Calculate offset to get the correct global index for each photo
-                        const previousPhotosCount = PHOTO_SECTIONS
-                            .slice(0, sIdx)
-                            .reduce((acc, s) => acc + s.photos.length, 0);
-
-                        return (
-                            <div key={section.id} id={section.id} style={{ scrollMarginTop: '120px' }}>
-                                <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1.5rem' }}>{section.title}</h2>
-                                <div style={{
-                                    display: 'grid',
-                                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                                    gap: '16px'
-                                }}>
-                                    {section.photos.map((photo, pIdx) => {
-                                        const globalIndex = previousPhotosCount + pIdx;
-                                        return (
-                                            <div
-                                                key={`${section.id}-${pIdx}`}
-                                                onClick={() => setSelectedPhotoIndex(globalIndex)}
-                                                style={{
-                                                    aspectRatio: '3/2',
-                                                    borderRadius: '12px',
-                                                    overflow: 'hidden',
-                                                    cursor: 'pointer',
-                                                    backgroundColor: 'var(--slate-100)',
-                                                    position: 'relative',
-                                                    transition: 'transform 0.3s ease'
-                                                }}
-                                                className="hover-scale-sm"
-                                            >
-                                                <img
-                                                    src={photo}
-                                                    alt={`${section.title} photo`}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                                                />
-                                                <div style={{
-                                                    position: 'absolute',
-                                                    inset: 0,
-                                                    backgroundColor: 'rgba(0,0,0,0)',
-                                                    transition: 'background-color 0.2s'
-                                                }} className="hover-overlay" />
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                            {/* Horizontal Category Navigation */}
+                            <div style={{
+                                display: 'flex',
+                                gap: '12px',
+                                overflowX: 'auto',
+                                paddingBottom: '16px',
+                                MsOverflowStyle: 'none',
+                                scrollbarWidth: 'none'
+                            }} className="hide-scrollbar">
+                                {PHOTO_SECTIONS.map((section) => (
+                                    <button
+                                        key={section.id}
+                                        onClick={() => scrollToSection(section.id)}
+                                        style={{
+                                            flexShrink: 0,
+                                            padding: '8px 16px',
+                                            borderRadius: '24px',
+                                            border: '1px solid #DDDDDD',
+                                            backgroundColor: activeSection === section.id ? '#F7F7F7' : 'white',
+                                            cursor: 'pointer',
+                                            fontSize: '14px',
+                                            fontWeight: 600,
+                                            color: '#222222',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            borderColor: activeSection === section.id ? '#222222' : '#DDDDDD'
+                                        }}
+                                    >
+                                        {section.icon}
+                                        {section.title}
+                                    </button>
+                                ))}
                             </div>
-                        );
-                    })}
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                            {PHOTO_SECTIONS.map((section, sIdx) => {
+                                const previousPhotosCount = PHOTO_SECTIONS
+                                    .slice(0, sIdx)
+                                    .reduce((acc, s) => acc + s.photos.length, 0);
+
+                                return (
+                                    <div key={section.id} id={section.id} style={{ scrollMarginTop: '0px', paddingTop: '10px' }}>
+                                        <h2 style={{ fontSize: '24px', fontWeight: 600, marginBottom: '24px', color: '#222222' }}>{section.title}</h2>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                                            {section.photos.map((photo, pIdx) => {
+                                                const globalIndex = previousPhotosCount + pIdx;
+                                                return (
+                                                    <div
+                                                        key={`${section.id}-${pIdx}`}
+                                                        onClick={() => setSelectedPhotoIndex(globalIndex)}
+                                                        style={{
+                                                            width: '100%',
+                                                            cursor: 'pointer',
+                                                            backgroundColor: '#F7F7F7',
+                                                            borderRadius: '12px',
+                                                            overflow: 'hidden'
+                                                        }}
+                                                    >
+                                                        <img
+                                                            src={photo}
+                                                            alt={`${section.title} image`}
+                                                            style={{ width: '100%', height: 'auto', display: 'block' }}
+                                                        />
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </main>
 
             {/* Lightbox Overlay */}
             {selectedPhotoIndex !== null && (
@@ -255,119 +277,89 @@ export default function PhotoTourPage() {
                     style={{
                         position: 'fixed',
                         inset: 0,
-                        backgroundColor: 'rgba(0, 0, 0, 0.98)',
-                        zIndex: 9999,
+                        backgroundColor: 'black',
+                        zIndex: 2000,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'zoom-out'
+                        justifyContent: 'center'
                     }}
                 >
-                    {/* Top Control Bar */}
-                    <div style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        height: '80px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 24px',
-                        zIndex: 1020,
-                        background: 'linear-gradient(to bottom, rgba(0,0,0,0.5), transparent)'
-                    }}>
-                        <div style={{ color: 'white', fontWeight: 600, fontSize: '15px' }}>
-                            {selectedPhotoIndex + 1} / {ALL_PHOTOS.length}
-                        </div>
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedPhotoIndex(null); }}
+                        style={{
+                            position: 'absolute',
+                            top: '24px',
+                            left: '24px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: 'white',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <X size={24} />
+                    </button>
 
-                        <button
-                            onClick={(e) => { e.stopPropagation(); setSelectedPhotoIndex(null); }}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                background: 'white',
-                                border: 'none',
-                                padding: '8px 16px',
-                                borderRadius: '100px',
-                                cursor: 'pointer',
-                                fontWeight: 700,
-                                fontSize: '14px',
-                                color: 'var(--slate-900)',
-                                boxShadow: '0 4px 15px rgba(0,0,0,0.4)',
-                                transition: 'transform 0.2s'
-                            }}
-                            className="hover-scale-sm"
-                        >
-                            <X size={18} />
-                            Close
-                        </button>
+                    <div style={{ position: 'absolute', top: '24px', right: '24px', color: 'white', fontSize: '16px' }}>
+                        {selectedPhotoIndex + 1} / {ALL_PHOTOS.length}
                     </div>
 
                     <div
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            position: 'relative',
-                            width: '90%',
-                            maxWidth: '1200px',
-                            height: '75vh',
+                            width: '100%',
+                            maxWidth: '1000px',
+                            maxHeight: '80vh',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            cursor: 'default'
+                            position: 'relative'
                         }}
                     >
                         <button
                             onClick={handleBack}
                             style={{
                                 position: 'absolute',
-                                left: '20px',
-                                background: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
+                                left: '-80px',
                                 width: '48px',
                                 height: '48px',
+                                borderRadius: '50%',
+                                border: '1px solid white',
+                                backgroundColor: 'transparent',
+                                color: 'white',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                                zIndex: 10
+                                cursor: 'pointer'
                             }}
+                            className="desktop-only"
                         >
                             <ChevronLeft size={24} />
                         </button>
 
                         <img
                             src={ALL_PHOTOS[selectedPhotoIndex]}
-                            alt="Gallery detail"
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                objectFit: 'contain',
-                                borderRadius: '8px'
-                            }}
+                            style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+                            alt="Full size"
                         />
 
                         <button
                             onClick={handleNext}
                             style={{
                                 position: 'absolute',
-                                right: '20px',
-                                background: 'white',
-                                border: 'none',
-                                borderRadius: '50%',
+                                right: '-80px',
                                 width: '48px',
                                 height: '48px',
+                                borderRadius: '50%',
+                                border: '1px solid white',
+                                backgroundColor: 'transparent',
+                                color: 'white',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                                zIndex: 10
+                                cursor: 'pointer'
                             }}
+                            className="desktop-only"
                         >
                             <ChevronRight size={24} />
                         </button>
@@ -376,14 +368,12 @@ export default function PhotoTourPage() {
             )}
 
             <style jsx global>{`
-                .hover-scale-sm:hover {
-                    transform: scale(1.02);
+                .hover-bg-f7:hover {
+                    background-color: #F7F7F7 !important;
                 }
-                .hover-bg-slate-100:hover {
-                    background-color: var(--slate-100);
-                }
-                .hover-overlay:hover {
-                    background-color: rgba(0,0,0,0.05) !important;
+                @media (max-width: 950px) {
+                    main { display: block !important; }
+                    aside { display: none !important; }
                 }
             `}</style>
         </div>

@@ -48,7 +48,7 @@ const CategoryBar: React.FC<CategoryBarProps> = ({ categories, activeCategoryId,
     return (
         <div style={{
             position: 'sticky',
-            top: '72px',
+            top: '140px',
             zIndex: 1000,
             backgroundColor: 'white',
             borderBottom: '1px solid var(--border)',

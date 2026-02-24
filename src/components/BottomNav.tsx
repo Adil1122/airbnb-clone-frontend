@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import { Home, Heart, Compass, MessageSquare, User } from 'lucide-react';
+import { Home, Heart, Search, MessageSquare, User } from 'lucide-react';
 import Link from 'next/link';
 
 const BottomNav: React.FC = () => {
     return (
         <div className="bottom-nav">
             <Link href="/" className="nav-item active">
-                <Compass size={24} />
+                <Search size={24} />
                 <span>Explore</span>
             </Link>
             <Link href="#" className="nav-item">
