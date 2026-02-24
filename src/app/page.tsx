@@ -133,7 +133,9 @@ const MOCK_PROPERTIES: Property[] = [
 const ALL_MOCK_PROPERTIES = [
   ...MOCK_PROPERTIES,
   ...MOCK_PROPERTIES.map(p => ({ ...p, id: p.id + 10 })),
-  ...MOCK_PROPERTIES.map(p => ({ ...p, id: p.id + 20 }))
+  ...MOCK_PROPERTIES.map(p => ({ ...p, id: p.id + 20 })),
+  ...MOCK_PROPERTIES.map(p => ({ ...p, id: p.id + 30 })),
+  ...MOCK_PROPERTIES.map(p => ({ ...p, id: p.id + 40 }))
 ];
 
 export default function Home() {
@@ -162,10 +164,10 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
           gap: '24px'
         }}>
-          {properties.slice(0, 8).map(property => (
+          {properties.slice(0, 12).map(property => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>
@@ -178,10 +180,10 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
           gap: '24px'
         }}>
-          {properties.slice(8, 16).map(property => (
+          {properties.slice(12, 24).map(property => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>
@@ -194,10 +196,10 @@ export default function Home() {
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
           gap: '24px'
         }}>
-          {properties.slice(16, 24).map(property => (
+          {properties.slice(24, 36).map(property => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>

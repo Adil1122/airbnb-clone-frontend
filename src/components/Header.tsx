@@ -41,12 +41,12 @@ const Header: React.FC = () => {
                         <div style={{ padding: '12px', cursor: 'pointer' }} className="desktop-only">
                             <Globe size={16} />
                         </div>
-                        <div className="user-menu-btn">
+                        <Link href="/signup-login" className="user-menu-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <Menu size={16} />
                             <div style={{ color: '#717171' }}>
                                 <UserCircle size={32} />
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
 

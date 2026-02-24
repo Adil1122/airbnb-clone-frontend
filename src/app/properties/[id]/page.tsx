@@ -21,14 +21,19 @@ import {
     ChevronRight,
     Map as MapIcon
 } from 'lucide-react';
-import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function PropertyDetailPage() {
+    const params = useParams();
+    const router = useRouter();
+    const id = params?.id as string;
+    const isProperty11 = id === '11';
+
     const property = {
-        id: 2,
-        title: "P4 - Lovely 2 BR 3 Beds, Family Choice, BTS!",
-        location: "Phaya Thai, Bangkok, Thailand",
-        price: 45, // Approximated per night based on Bangkok prices usually seen
+        id: parseInt(id) || 2,
+        title: isProperty11 ? "Luxury Villa with Panoramic Views" : "P4 - Lovely 2 BR 3 Beds, Family Choice, BTS!",
+        location: isProperty11 ? "Bang Rak, Bangkok, Thailand" : "Phaya Thai, Bangkok, Thailand",
+        price: isProperty11 ? 120 : 45,
         rating: 4.88,
         reviews: 42,
         guestsCount: 5,
@@ -48,6 +53,12 @@ export default function PropertyDetailPage() {
             "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&q=80&w=600",
             "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&q=80&w=600"
         ]
+    };
+
+    const handlePhotoClick = () => {
+        if (isProperty11) {
+            router.push('/services/3/photos');
+        }
     };
 
     return (
@@ -71,15 +82,19 @@ export default function PropertyDetailPage() {
                 </div>
 
                 {/* Airbnb Style 5-Image Grid */}
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: '2fr 1fr 1fr',
-                    gridTemplateRows: 'repeat(2, 225px)',
-                    gap: '8px',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    position: 'relative'
-                }}>
+                <div
+                    onClick={handlePhotoClick}
+                    style={{
+                        display: 'grid',
+                        gridTemplateColumns: '2fr 1fr 1fr',
+                        gridTemplateRows: 'repeat(2, 225px)',
+                        gap: '8px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        position: 'relative',
+                        cursor: isProperty11 ? 'pointer' : 'default'
+                    }}
+                >
                     {/* Main Large Image */}
                     <div style={{ gridColumn: '1 / 2', gridRow: '1 / 3' }}>
                         <img src={property.images[0]} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Main" />
