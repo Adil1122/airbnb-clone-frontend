@@ -27,13 +27,11 @@ export default function PropertyDetailPage() {
     const params = useParams();
     const router = useRouter();
     const id = params?.id as string;
-    const isProperty11 = id === '11';
-
     const property = {
         id: parseInt(id) || 2,
-        title: isProperty11 ? "Luxury Villa with Panoramic Views" : "P4 - Lovely 2 BR 3 Beds, Family Choice, BTS!",
-        location: isProperty11 ? "Bang Rak, Bangkok, Thailand" : "Phaya Thai, Bangkok, Thailand",
-        price: isProperty11 ? 120 : 45,
+        title: "Lovely 2 BR 3 Beds, Family Choice, BTS!",
+        location: "Bang Rak, Bangkok, Thailand",
+        price: 45,
         rating: 4.88,
         reviews: 42,
         guestsCount: 5,
@@ -56,9 +54,7 @@ export default function PropertyDetailPage() {
     };
 
     const handlePhotoClick = () => {
-        if (isProperty11) {
-            router.push('/services/3/photos');
-        }
+        router.push('/services/3/photos');
     };
 
     return (
@@ -92,7 +88,7 @@ export default function PropertyDetailPage() {
                         borderRadius: '12px',
                         overflow: 'hidden',
                         position: 'relative',
-                        cursor: isProperty11 ? 'pointer' : 'default'
+                        cursor: 'pointer'
                     }}
                 >
                     {/* Main Large Image */}
