@@ -199,7 +199,7 @@ export default function PhotoTourPage() {
                                 gap: '12px',
                                 overflowX: 'auto',
                                 paddingBottom: '16px',
-                                MsOverflowStyle: 'none',
+                                msOverflowStyle: 'none',
                                 scrollbarWidth: 'none'
                             }} className="hide-scrollbar">
                                 {PHOTO_SECTIONS.map((section) => (
