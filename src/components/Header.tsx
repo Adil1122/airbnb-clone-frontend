@@ -1,10 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search, Globe, Menu, UserCircle, Command } from 'lucide-react';
+import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail } from 'lucide-react';
 import Link from 'next/link';
+import Modal from './Modal';
 
 const Header: React.FC = () => {
+    const [isHostModalOpen, setIsHostModalOpen] = useState(false);
+    const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+    const [activeLanguageTab, setActiveLanguageTab] = useState<'language' | 'currency'>('language');
+
     return (
         <header className="sticky top-0 z-[1100]">
             <div className="container">
@@ -37,18 +42,244 @@ const Header: React.FC = () => {
 
                     {/* Right Menu */}
                     <div className="header-right">
-                        <div className="host-link desktop-only">Become a host</div>
-                        <div style={{ padding: '12px', cursor: 'pointer' }} className="desktop-only">
+                        <div
+                            className="host-link desktop-only"
+                            onClick={() => setIsHostModalOpen(true)}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            Become a host
+                        </div>
+                        <div
+                            style={{ padding: '12px', cursor: 'pointer' }}
+                            className="desktop-only"
+                            onClick={() => setIsLanguageModalOpen(true)}
+                        >
                             <Globe size={16} />
                         </div>
-                        <Link href="/signup-login" className="user-menu-btn" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <div
+                            className="user-menu-btn"
+                            style={{ cursor: 'pointer' }}
+                        >
                             <Menu size={16} />
                             <div style={{ color: '#717171' }}>
                                 <UserCircle size={32} />
                             </div>
-                        </Link>
+                        </div>
                     </div>
                 </div>
+
+                {/* Host Selection Modal */}
+                <Modal
+                    isOpen={isHostModalOpen}
+                    onClose={() => setIsHostModalOpen(false)}
+                    title="What would you like to host?"
+                    maxWidth="800px"
+                    footer={
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <button style={{
+                                padding: '10px 24px',
+                                background: '#dddddd',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '16px',
+                                fontWeight: 600,
+                                cursor: 'not-allowed'
+                            }}>
+                                Next
+                            </button>
+                        </div>
+                    }
+                >
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', padding: '16px 0' }}>
+                        <HostOption
+                            icon={<HomeIcon size={48} />}
+                            label="Home"
+                        />
+                        <HostOption
+                            icon={<BalloonIcon size={48} />}
+                            label="Experience"
+                        />
+                        <HostOption
+                            icon={<ClocheIcon size={48} />}
+                            label="Service"
+                        />
+                    </div>
+                </Modal>
+
+                {/* Language Modal */}
+                <Modal
+                    isOpen={isLanguageModalOpen}
+                    onClose={() => setIsLanguageModalOpen(false)}
+                    title="Language and currency"
+                    maxWidth="1032px"
+                >
+                    <div className="language-modal-content">
+                        <div style={{ display: 'flex', gap: '24px', borderBottom: '1px solid #ebebeb', marginBottom: '24px' }}>
+                            <button
+                                onClick={() => setActiveLanguageTab('language')}
+                                style={{
+                                    padding: '12px 0',
+                                    borderBottom: activeLanguageTab === 'language' ? '2px solid #222222' : '2px solid transparent',
+                                    background: 'none',
+                                    borderTop: 'none',
+                                    borderLeft: 'none',
+                                    borderRight: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    color: activeLanguageTab === 'language' ? '#222222' : '#717171'
+                                }}
+                            >
+                                Language and region
+                            </button>
+                            <button
+                                onClick={() => setActiveLanguageTab('currency')}
+                                style={{
+                                    padding: '12px 0',
+                                    borderBottom: activeLanguageTab === 'currency' ? '2px solid #222222' : '2px solid transparent',
+                                    background: 'none',
+                                    borderTop: 'none',
+                                    borderLeft: 'none',
+                                    borderRight: 'none',
+                                    cursor: 'pointer',
+                                    fontWeight: 600,
+                                    color: activeLanguageTab === 'currency' ? '#222222' : '#717171'
+                                }}
+                            >
+                                Currency
+                            </button>
+                        </div>
+
+                        {activeLanguageTab === 'language' ? (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                                {/* ... existing languages ... */}
+                                {[
+                                    { name: 'English', region: 'United States' },
+                                    { name: 'English', region: 'United Kingdom' },
+                                    { name: 'English', region: 'India' },
+                                    { name: 'English', region: 'Australia' },
+                                    { name: 'English', region: 'Canada' },
+                                    { name: 'Français', region: 'France' },
+                                    { name: 'Français', region: 'Canada' },
+                                    { name: 'Français', region: 'Belgique' },
+                                    { name: 'Français', region: 'Suisse' },
+                                    { name: 'Deutsch', region: 'Deutschland' },
+                                    { name: 'Deutsch', region: 'Österreich' },
+                                    { name: 'Deutsch', region: 'Schweiz' },
+                                    { name: 'Español', region: 'España' },
+                                    { name: 'Español', region: 'México' },
+                                    { name: 'Español', region: 'Argentina' },
+                                    { name: 'Español', region: 'Colombia' },
+                                    { name: 'Italiano', region: 'Italia' },
+                                    { name: 'Italiano', region: 'Svizzera' },
+                                    { name: 'Português', region: 'Brasil' },
+                                    { name: 'Português', region: 'Portugal' },
+                                    { name: 'Türkçe', region: 'Türkiye' },
+                                    { name: 'العربية', region: 'العالم' },
+                                    { name: 'العربية', region: 'مصر' },
+                                    { name: 'العربية', region: 'السعودية' },
+                                    { name: 'العربية', region: 'الإمارات' },
+                                    { name: '日本語', region: '日本' },
+                                    { name: '한국어', region: '대한민국' },
+                                    { name: '中文', region: '简体' },
+                                    { name: '中文', region: '繁體' },
+                                    { name: '中文', region: '香港' },
+                                    { name: 'Русский', region: 'Россия' },
+                                    { name: 'Polski', region: 'Polska' },
+                                    { name: 'Nederlands', region: 'Nederland' },
+                                    { name: 'Nederlands', region: 'België' },
+                                    { name: 'Svenska', region: 'Sverige' },
+                                    { name: 'Norsk', region: 'Norge' },
+                                    { name: 'Dansk', region: 'Danmark' },
+                                    { name: 'Suomi', region: 'Suomi' },
+                                    { name: 'Tiếng Việt', region: 'Việt Nam' },
+                                    { name: 'Tagalog', region: 'Pilipinas' },
+                                    { name: 'Melayu', region: 'Malaysia' },
+                                    { name: 'Bahasa Indonesia', region: 'Indonesia' },
+                                    { name: 'हिन्दी', region: 'भारत' },
+                                    { name: 'Bengali', region: 'India' },
+                                    { name: 'বাংলা', region: 'বাংলাদেশ' },
+                                    { name: 'Magyar', region: 'Magyarország' },
+                                    { name: 'Čeština', region: 'Česká republika' },
+                                    { name: 'Slovenčina', region: 'Slovensko' },
+                                    { name: 'Română', region: 'România' },
+                                    { name: 'Ελληνικά', region: 'Ελλάδα' },
+                                    { name: 'עברית', region: 'ישראל' },
+                                ].map((lang, i) => (
+                                    <div key={i} style={{
+                                        padding: '12px',
+                                        borderRadius: '8px',
+                                        cursor: 'pointer',
+                                        transition: 'background 0.2s'
+                                    }} className="lang-item">
+                                        <div style={{ fontSize: '14px', color: '#222222', fontWeight: 500 }}>{lang.name}</div>
+                                        <div style={{ fontSize: '14px', color: '#717171' }}>{lang.region}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div>
+                                <h3 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '24px' }}>Choose a currency</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
+                                    {[
+                                        { name: 'United States dollar', code: 'USD', symbol: '$' },
+                                        { name: 'Australian dollar', code: 'AUD', symbol: '$' },
+                                        { name: 'Brazilian real', code: 'BRL', symbol: 'R$' },
+                                        { name: 'Bulgarian lev', code: 'BGN', symbol: 'лв.' },
+                                        { name: 'Canadian dollar', code: 'CAD', symbol: '$' },
+                                        { name: 'Chilean peso', code: 'CLP', symbol: '$' },
+                                        { name: 'Chinese yuan', code: 'CNY', symbol: '¥' },
+                                        { name: 'Colombian peso', code: 'COP', symbol: '$' },
+                                        { name: 'Costa Rican colon', code: 'CRC', symbol: '₡' },
+                                        { name: 'Czech koruna', code: 'CZK', symbol: 'Kč' },
+                                        { name: 'Danish krone', code: 'DKK', symbol: 'kr' },
+                                        { name: 'Egyptian pound', code: 'EGP', symbol: 'ج.م' },
+                                        { name: 'Emirati dirham', code: 'AED', symbol: 'د.إ' },
+                                        { name: 'Euro', code: 'EUR', symbol: '€' },
+                                        { name: 'Ghanaian cedi', code: 'GHS', symbol: 'GH₵' },
+                                        { name: 'Hong Kong dollar', code: 'HKD', symbol: '$' },
+                                        { name: 'Hungarian forint', code: 'HUF', symbol: 'Ft' },
+                                        { name: 'Indian rupee', code: 'INR', symbol: '₹' },
+                                        { name: 'Indonesian rupiah', code: 'IDR', symbol: 'Rp' },
+                                        { name: 'Israeli new shekel', code: 'ILS', symbol: '₪' },
+                                        { name: 'Japanese yen', code: 'JPY', symbol: '¥' },
+                                        { name: 'Kazakhstani tenge', code: 'KZT', symbol: '₸' },
+                                        { name: 'Kenyan shilling', code: 'KES', symbol: 'KSh' },
+                                        { name: 'Malaysian ringgit', code: 'MYR', symbol: 'RM' },
+                                        { name: 'Mexican peso', code: 'MXN', symbol: '$' },
+                                        { name: 'Moroccan dirham', code: 'MAD', symbol: 'د.م.' },
+                                        { name: 'New Taiwan dollar', code: 'TWD', symbol: '$' },
+                                        { name: 'New Zealand dollar', code: 'NZD', symbol: '$' },
+                                        { name: 'Norwegian krone', code: 'NOK', symbol: 'kr' },
+                                        { name: 'Peruvian sol', code: 'PEN', symbol: 'S/' },
+                                        { name: 'Philippine peso', code: 'PHP', symbol: '₱' },
+                                        { name: 'Polish zloty', code: 'PLN', symbol: 'zł' },
+                                        { name: 'Pound sterling', code: 'GBP', symbol: '£' },
+                                        { name: 'Qatari riyal', code: 'QAR', symbol: 'ر.ق' },
+                                        { name: 'Romanian leu', code: 'RON', symbol: 'lei' },
+                                    ].map((curr, i) => (
+                                        <div key={i} style={{
+                                            padding: '12px',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            transition: 'background 0.2s',
+                                            border: curr.code === 'USD' ? '1px solid #222222' : 'none'
+                                        }} className="lang-item">
+                                            <div style={{ fontSize: '14px', color: '#222222', fontWeight: 500 }}>{curr.name}</div>
+                                            <div style={{ fontSize: '14px', color: '#717171' }}>{curr.code} – {curr.symbol}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                    <style jsx>{`
+                        .lang-item:hover {
+                            background-color: #f7f7f7;
+                        }
+                    `}</style>
+                </Modal>
+
 
                 {/* Search Bar */}
                 <div className="search-container">
@@ -77,6 +308,31 @@ const Header: React.FC = () => {
     );
 };
 
+const SocialBtn = ({ icon, label }: { icon: string, label: string }) => (
+    <button style={{
+        width: '100%',
+        padding: '12px',
+        background: 'white',
+        border: '1px solid #222222',
+        borderRadius: '8px',
+        fontSize: '14px',
+        fontWeight: 600,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative'
+    }}>
+        <div style={{ position: 'absolute', left: '24px' }}>
+            {icon === 'Facebook' && <Facebook size={20} color="#1877F2" />}
+            {icon === 'Google' && <svg viewBox="0 0 18 18" width="18" height="18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"></path><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"></path><path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"></path><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.468 2.01.957 4.962l3.007 2.332c.708-2.127 2.692-3.714 5.036-3.714z" fill="#EA4335"></path></svg>}
+            {icon === 'Apple' && <Apple size={20} />}
+            {icon === 'Mail' && <Mail size={20} />}
+        </div>
+        {label}
+    </button>
+);
+
 // Custom icons for the header tabs to match Airbnb target
 const HomeIcon = ({ size = 28 }) => (
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', height: `${size}px`, width: `${size}px`, fill: 'currentColor' }}>
@@ -94,6 +350,30 @@ const ClocheIcon = ({ size = 28 }) => (
     <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', height: `${size}px`, width: `${size}px`, fill: 'currentColor' }}>
         <path d="M16 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm15 15a1 1 0 0 1 0 2H1a1 1 0 0 1 0-2h1.04C3.02 13.45 8.9 7.86 16 7.86s12.98 5.59 13.96 13.14z"></path>
     </svg>
+);
+
+const HostOption = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
+    <div style={{
+        border: '1px solid #dddddd',
+        borderRadius: '12px',
+        padding: '32px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '16px',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease'
+    }} className="host-option">
+        <div style={{ color: '#222222' }}>{icon}</div>
+        <span style={{ fontSize: '18px', fontWeight: 600, color: '#222222' }}>{label}</span>
+        <style jsx>{`
+            .host-option:hover {
+                border-color: #222222;
+                box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+            }
+        `}</style>
+    </div>
 );
 
 export default Header;
