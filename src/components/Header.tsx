@@ -141,16 +141,15 @@ const Header: React.FC = () => {
                                     <div style={{ height: '1px', background: '#ebebeb', margin: '4px 0' }}></div>
 
                                     {/* Section 4: Auth */}
-                                    <div
-                                        className="menu-item"
-                                        style={{ padding: '12px 16px', fontWeight: 600, cursor: 'pointer' }}
-                                        onClick={() => {
-                                            setIsAuthModalOpen(true);
-                                            setIsUserMenuOpen(false);
-                                        }}
-                                    >
-                                        Log in or sign up
-                                    </div>
+                                    <Link href="/signup-login" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <div
+                                            className="menu-item"
+                                            style={{ padding: '12px 16px', fontWeight: 600, cursor: 'pointer' }}
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                        >
+                                            Log in or sign up
+                                        </div>
+                                    </Link>
                                 </div>
                             )}
                         </div>
