@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Heart, Star, Compass, Facebook, Apple, Mail } from 'lucide-react';
-import Modal from '@/components/Modal';
+import { ChevronRight, Heart, Star, Compass } from 'lucide-react';
 
 interface Property {
   id: number;
@@ -141,7 +140,6 @@ const ALL_MOCK_PROPERTIES = [
 
 export default function Home() {
   const [properties] = useState<Property[]>(ALL_MOCK_PROPERTIES);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   return (
     <div className="prime-home">
@@ -173,7 +171,7 @@ export default function Home() {
             <PropertyCard
               key={property.id}
               property={property}
-              onHeartClick={() => setIsAuthModalOpen(true)}
+              onHeartClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}
             />
           ))}
         </div>
@@ -193,7 +191,7 @@ export default function Home() {
             <PropertyCard
               key={property.id}
               property={property}
-              onHeartClick={() => setIsAuthModalOpen(true)}
+              onHeartClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}
             />
           ))}
         </div>
@@ -213,72 +211,10 @@ export default function Home() {
             <PropertyCard
               key={property.id}
               property={property}
-              onHeartClick={() => setIsAuthModalOpen(true)}
+              onHeartClick={() => window.dispatchEvent(new CustomEvent('open-auth-modal'))}
             />
           ))}
         </div>
-        {/* Auth Modal */}
-        <Modal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-          title="Log in or sign up"
-        >
-          <div className="auth-modal-content" style={{ padding: '8px' }}>
-            <h3 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '24px' }}>Welcome to Airbnb</h3>
-
-            <div className="input-field" style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '12px', color: '#717171', marginBottom: '4px' }}>Phone number</label>
-              <input
-                type="text"
-                placeholder="Phone number"
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  border: '1px solid #b0b0b0',
-                  borderRadius: '8px',
-                  fontSize: '16px'
-                }}
-              />
-            </div>
-
-            <p style={{ fontSize: '12px', color: '#222222', marginTop: '8px', marginBottom: '24px' }}>
-              We’ll call or text you to confirm your number. Standard message and data rates apply.
-            </p>
-
-            <button style={{
-              width: '100%',
-              padding: '14px',
-              background: '#E31C5F', // Airbnb brand color
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              marginBottom: '24px'
-            }}>
-              Continue
-            </button>
-
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              margin: '24px 0',
-              gap: '16px'
-            }}>
-              <div style={{ flex: 1, height: '1px', background: '#ebebeb' }}></div>
-              <span style={{ fontSize: '12px', color: '#717171' }}>or</span>
-              <div style={{ flex: 1, height: '1px', background: '#ebebeb' }}></div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <SocialBtn icon="Facebook" label="Continue with Facebook" />
-              <SocialBtn icon="Google" label="Continue with Google" />
-              <SocialBtn icon="Apple" label="Continue with Apple" />
-              <SocialBtn icon="Mail" label="Continue with email" />
-            </div>
-          </div>
-        </Modal>
       </div>
     </div>
   );
@@ -355,28 +291,3 @@ const PropertyCard = ({ property, onHeartClick }: { property: Property, onHeartC
     </Link>
   );
 };
-const SocialBtn = ({ icon, label }: { icon: string, label: string }) => (
-  <button style={{
-    width: '100%',
-    padding: '12px',
-    background: 'white',
-    border: '1px solid #222222',
-    borderRadius: '8px',
-    fontSize: '14px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '12px',
-    position: 'relative'
-  }}>
-    <div style={{ position: 'absolute', left: '24px' }}>
-      {icon === 'Facebook' && <Facebook size={20} color="#1877F2" />}
-      {icon === 'Google' && <svg viewBox="0 0 18 18" width="18" height="18"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"></path><path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"></path><path d="M3.964 10.706A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.706V4.962H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.038l3.007-2.332z" fill="#FBBC05"></path><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.468 2.01.957 4.962l3.007 2.332c.708-2.127 2.692-3.714 5.036-3.714z" fill="#EA4335"></path></svg>}
-      {icon === 'Apple' && <Apple size={20} />}
-      {icon === 'Mail' && <Mail size={20} />}
-    </div>
-    {label}
-  </button>
-);

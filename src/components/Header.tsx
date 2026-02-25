@@ -1,14 +1,34 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
 import Modal from './Modal';
 
 const Header: React.FC = () => {
     const [isHostModalOpen, setIsHostModalOpen] = useState(false);
     const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [activeLanguageTab, setActiveLanguageTab] = useState<'language' | 'currency'>('language');
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleOpenAuth = () => setIsAuthModalOpen(true);
+        window.addEventListener('open-auth-modal', handleOpenAuth);
+
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            window.removeEventListener('open-auth-modal', handleOpenAuth);
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     return (
         <header className="sticky top-0 z-[1100]">
@@ -58,15 +78,146 @@ const Header: React.FC = () => {
                         </div>
                         <div
                             className="user-menu-btn"
-                            style={{ cursor: 'pointer' }}
+                            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                            style={{ cursor: 'pointer', position: 'relative' }}
                         >
                             <Menu size={16} />
                             <div style={{ color: '#717171' }}>
                                 <UserCircle size={32} />
                             </div>
+
+                            {/* Precise User Menu Dropdown */}
+                            {isUserMenuOpen && (
+                                <div
+                                    ref={menuRef}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '55px',
+                                        right: '0',
+                                        width: '240px',
+                                        background: 'white',
+                                        borderRadius: '12px',
+                                        boxShadow: '0 2px 16px rgba(0,0,0,0.12)',
+                                        padding: '8px 0',
+                                        zIndex: 2000,
+                                        cursor: 'default'
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    {/* Section 1: Help Center */}
+                                    <div className="menu-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px' }}>
+                                        <HelpCircle size={18} />
+                                        <span>Help Center</span>
+                                    </div>
+                                    <div style={{ height: '1px', background: '#ebebeb', margin: '4px 0' }}></div>
+
+                                    {/* Section 2: Become a host */}
+                                    <div
+                                        className="menu-item"
+                                        style={{ padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                                        onClick={() => {
+                                            setIsHostModalOpen(true);
+                                            setIsUserMenuOpen(false);
+                                        }}
+                                    >
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{ fontWeight: 600 }}>Become a host</span>
+                                            <span style={{ fontSize: '13px', color: '#717171' }}>It's easy to start hosting and earn extra income.</span>
+                                        </div>
+                                        <div style={{ opacity: 0.6 }}>
+                                            {/* Small person icon as seen in image */}
+                                            <UserCircle size={28} />
+                                        </div>
+                                    </div>
+
+                                    {/* Section 3: Simple Links */}
+                                    <Link href="/refer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <div className="menu-item" style={{ padding: '10px 16px' }}>Refer a Host</div>
+                                    </Link>
+                                    <div className="menu-item" style={{ padding: '10px 16px' }}>Find a co-host</div>
+                                    <Link href="/giftcards" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <div className="menu-item" style={{ padding: '10px 16px' }}>Gift cards</div>
+                                    </Link>
+                                    <div style={{ height: '1px', background: '#ebebeb', margin: '4px 0' }}></div>
+
+                                    {/* Section 4: Auth */}
+                                    <div
+                                        className="menu-item"
+                                        style={{ padding: '12px 16px', fontWeight: 600, cursor: 'pointer' }}
+                                        onClick={() => {
+                                            setIsAuthModalOpen(true);
+                                            setIsUserMenuOpen(false);
+                                        }}
+                                    >
+                                        Log in or sign up
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
+
+                {/* Auth Modal (Re-integrated) */}
+                <Modal
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                    title="Log in or sign up"
+                >
+                    <div className="auth-modal-content">
+                        <h3 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '24px' }}>Welcome to Airbnb</h3>
+
+                        <div className="input-field">
+                            <label style={{ display: 'block', fontSize: '12px', color: '#717171', marginBottom: '4px' }}>Phone number</label>
+                            <input
+                                type="text"
+                                placeholder="Phone number"
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    border: '1px solid #b0b0b0',
+                                    borderRadius: '8px',
+                                    fontSize: '16px'
+                                }}
+                            />
+                        </div>
+
+                        <p style={{ fontSize: '12px', color: '#222222', marginTop: '8px', marginBottom: '24px' }}>
+                            We’ll call or text you to confirm your number. Standard message and data rates apply.
+                        </p>
+
+                        <button style={{
+                            width: '100%',
+                            padding: '14px',
+                            background: '#E31C5F',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '8px',
+                            fontSize: '16px',
+                            fontWeight: 600,
+                            cursor: 'pointer'
+                        }}>
+                            Continue
+                        </button>
+
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            margin: '24px 0',
+                            gap: '16px'
+                        }}>
+                            <div style={{ flex: 1, height: '1px', background: '#ebebeb' }}></div>
+                            <span style={{ fontSize: '12px', color: '#717171' }}>or</span>
+                            <div style={{ flex: 1, height: '1px', background: '#ebebeb' }}></div>
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            <SocialBtn icon="Facebook" label="Continue with Facebook" />
+                            <SocialBtn icon="Google" label="Continue with Google" />
+                            <SocialBtn icon="Apple" label="Continue with Apple" />
+                            <SocialBtn icon="Mail" label="Continue with email" />
+                        </div>
+                    </div>
+                </Modal>
 
                 {/* Host Selection Modal */}
                 <Modal
@@ -274,8 +425,14 @@ const Header: React.FC = () => {
                         )}
                     </div>
                     <style jsx>{`
-                        .lang-item:hover {
+                        .lang-item:hover, .menu-item:hover {
                             background-color: #f7f7f7;
+                        }
+                        .menu-item {
+                            cursor: pointer;
+                            transition: background-color 0.2s;
+                            font-size: 14px;
+                            color: #222222;
                         }
                     `}</style>
                 </Modal>
