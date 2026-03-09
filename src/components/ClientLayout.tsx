@@ -3,6 +3,8 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import Header from './Header';
+import Link from 'next/link';
+
 
 interface ClientLayoutProps {
     children: React.ReactNode;
@@ -11,10 +13,16 @@ interface ClientLayoutProps {
 export default function ClientLayout({ children }: ClientLayoutProps) {
     const pathname = usePathname();
     const isPhotosPage = pathname?.includes('/services/') && pathname?.includes('/photos');
+    const isArticlePage = pathname?.includes('/help/article/');
+    const isHelpPage = pathname === '/help';
+    const isInsurancePage = pathname === '/e/travelinsurance';
+    const isAgainstDiscriminationPage = pathname === '/against-discrimination';
+    const isAccessibilityPage = pathname === '/accessibility';
 
     return (
         <div className="app-layout" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            {!isPhotosPage && <Header />}
+            {!isPhotosPage && !isHelpPage && !isArticlePage && !isInsurancePage && !isAgainstDiscriminationPage && !isAccessibilityPage && <Header />}
+
             <main style={{ flex: 1 }}>
                 {children}
             </main>
@@ -38,10 +46,12 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                             <div>
                                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#222222', marginBottom: '12px' }}>Support</h3>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Help Center</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">AirCover</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Anti-discrimination</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Disability support</a></li>
+                                    <li><Link href="/help" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Help Center</Link></li>
+
+                                    <li><Link href="/help/article/3218" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">AirCover</Link></li>
+                                    <li><Link href="/e/travelinsurance" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Travel Insurance</Link></li>
+                                    <li><Link href="/against-discrimination" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Anti-discrimination</Link></li>
+                                    <li><Link href="/accessibility" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Disability support</Link></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Cancellation options</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Report neighborhood concern</a></li>
                                 </ul>

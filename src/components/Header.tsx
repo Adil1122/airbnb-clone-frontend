@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Modal from './Modal';
 
 const Header: React.FC = () => {
@@ -12,6 +13,8 @@ const Header: React.FC = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [activeLanguageTab, setActiveLanguageTab] = useState<'language' | 'currency'>('language');
     const menuRef = useRef<HTMLDivElement>(null);
+    const pathname = usePathname();
+    const isSearchPage = pathname === '/search';
 
     useEffect(() => {
         const handleOpenAuth = () => setIsAuthModalOpen(true);
@@ -48,17 +51,36 @@ const Header: React.FC = () => {
                     </Link>
 
                     {/* Navigation Tabs */}
-                    <div className="nav-tabs desktop-only" style={{ display: 'flex', gap: '24px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                        <div className="nav-tab active" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: '2px solid #222222' }}>
-                            <span style={{ color: '#222222', fontSize: '16px', fontWeight: 600 }}>Homes</span>
+                    {!isSearchPage && (
+                        <div className="nav-tabs desktop-only" style={{ display: 'flex', gap: '24px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                            <div className="nav-tab active" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: '2px solid #222222' }}>
+                                <span style={{ color: '#222222', fontSize: '16px', fontWeight: 600 }}>Homes</span>
+                            </div>
+                            <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
+                                <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Experiences</span>
+                            </div>
+                            <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
+                                <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Services</span>
+                            </div>
                         </div>
-                        <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
-                            <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Experiences</span>
+                    )}
+
+                    {isSearchPage && (
+                        <div style={{ display: 'flex', gap: '16px', position: 'absolute', left: '50%', transform: 'translateX(-50%)', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '8px', border: '1px solid #DDDDDD', borderRadius: '40px', padding: '8px 8px', boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.05)', backgroundColor: 'white', alignItems: 'center', height: '48px', transition: 'box-shadow 0.2s', cursor: 'pointer' }}>
+                                <button style={{ border: 'none', background: 'none', fontWeight: 600, fontSize: '14px', padding: '0 16px', cursor: 'pointer', borderRight: '1px solid #DDDDDD' }}>Homes nearby</button>
+                                <button style={{ border: 'none', background: 'none', fontWeight: 600, fontSize: '14px', padding: '0 16px', cursor: 'pointer', borderRight: '1px solid #DDDDDD' }}>Any week</button>
+                                <button style={{ border: 'none', background: 'none', color: '#717171', fontSize: '14px', padding: '0 16px', cursor: 'pointer' }}>Add guests</button>
+                                <button style={{ background: '#FF385C', border: 'none', color: 'white', width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', marginLeft: '4px' }}>
+                                    <Search size={14} strokeWidth={3} />
+                                </button>
+                            </div>
+                            <button style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 16px', border: '1px solid #DDDDDD', borderRadius: '24px', background: 'white', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', height: '14px', width: '14px', fill: 'currentColor' }}><path d="M5 8a3 3 0 0 1 2.83 2H14v2H7.83A3 3 0 1 1 5 8zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm6-8a3 3 0 1 1-2.83 4H2V4h6.17A3 3 0 0 1 11 2zm0 2a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path></svg>
+                                Filters
+                            </button>
                         </div>
-                        <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
-                            <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Services</span>
-                        </div>
-                    </div>
+                    )}
 
                     {/* Right Menu */}
                     <div className="header-right">
@@ -104,11 +126,13 @@ const Header: React.FC = () => {
                                     }}
                                     onClick={(e) => e.stopPropagation()}
                                 >
-                                    {/* Section 1: Help Center */}
-                                    <div className="menu-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px' }}>
-                                        <HelpCircle size={18} />
-                                        <span>Help Center</span>
-                                    </div>
+                                    <Link href="/help" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        <div className="menu-item" style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px' }}>
+                                            <HelpCircle size={18} />
+                                            <span>Help Center</span>
+                                        </div>
+                                    </Link>
+
                                     <div style={{ height: '1px', background: '#ebebeb', margin: '4px 0' }}></div>
 
                                     {/* Section 2: Become a host */}
@@ -438,27 +462,31 @@ const Header: React.FC = () => {
 
 
                 {/* Search Bar */}
-                <div className="search-container">
-                    <div className="search-bar-full">
-                        <div className="search-item">
-                            <span className="search-label">Where</span>
-                            <span className="search-value" style={{ fontSize: '14px' }}>Search destinations</span>
-                        </div>
-                        <div className="search-divider desktop-only"></div>
-                        <div className="search-item desktop-only">
-                            <span className="search-label">When</span>
-                            <span className="search-value">Add dates</span>
-                        </div>
-                        <div className="search-divider desktop-only"></div>
-                        <div className="search-item desktop-only">
-                            <span className="search-label">Who</span>
-                            <span className="search-value">Add guests</span>
-                        </div>
-                        <button className="search-btn-red">
-                            <Search size={18} strokeWidth={2.5} />
-                        </button>
+                {!isSearchPage && (
+                    <div className="search-container">
+                        <Link href="/search" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', width: '100%', justifyContent: 'center' }}>
+                            <div className="search-bar-full">
+                                <div className="search-item">
+                                    <span className="search-label">Where</span>
+                                    <span className="search-value" style={{ fontSize: '14px' }}>Search destinations</span>
+                                </div>
+                                <div className="search-divider desktop-only"></div>
+                                <div className="search-item desktop-only">
+                                    <span className="search-label">When</span>
+                                    <span className="search-value">Add dates</span>
+                                </div>
+                                <div className="search-divider desktop-only"></div>
+                                <div className="search-item desktop-only">
+                                    <span className="search-label">Who</span>
+                                    <span className="search-value">Add guests</span>
+                                </div>
+                                <button className="search-btn-red">
+                                    <Search size={18} strokeWidth={2.5} />
+                                </button>
+                            </div>
+                        </Link>
                     </div>
-                </div>
+                )}
             </div>
         </header>
     );
