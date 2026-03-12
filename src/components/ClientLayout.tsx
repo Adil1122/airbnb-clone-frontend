@@ -18,10 +18,14 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
     const isInsurancePage = pathname === '/e/travelinsurance';
     const isAgainstDiscriminationPage = pathname === '/against-discrimination';
     const isAccessibilityPage = pathname === '/accessibility';
+    const isHostHomesPage = pathname === '/host/homes';
+    const isAirbnbFriendlyPage = pathname === '/airbnb-friendly';
+    const isIntroToHostingPage = pathname === '/e/intro-to-hosting';
+    const isCareersPage = pathname === '/careers';
 
     return (
         <div className="app-layout" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            {!isPhotosPage && !isHelpPage && !isArticlePage && !isInsurancePage && !isAgainstDiscriminationPage && !isAccessibilityPage && <Header />}
+            {!isPhotosPage && !isHelpPage && !isArticlePage && !isInsurancePage && !isAgainstDiscriminationPage && !isAccessibilityPage && !isHostHomesPage && !isAirbnbFriendlyPage && !isIntroToHostingPage && !isCareersPage && <Header />}
 
             <main style={{ flex: 1 }}>
                 {children}
@@ -53,7 +57,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                                     <li><Link href="/against-discrimination" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Anti-discrimination</Link></li>
                                     <li><Link href="/accessibility" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Disability support</Link></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Cancellation options</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Report neighborhood concern</a></li>
+                                    <li><Link href="/help/article/3290" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Report neighborhood concern</Link></li>
                                 </ul>
                             </div>
 
@@ -61,13 +65,13 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                             <div>
                                 <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#222222', marginBottom: '12px' }}>Hosting</h3>
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Airbnb your home</a></li>
+                                    <li><Link href="/host/homes" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Airbnb your home</Link></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">AirCover for Hosts</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Hosting resources</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Community forum</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Hosting responsibly</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Airbnb-friendly apartments</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Join a free hosting class</a></li>
+                                    <li><Link href="/airbnb-friendly" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Airbnb-friendly apartments</Link></li>
+                                    <li><Link href="/e/intro-to-hosting" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Join a free hosting class</Link></li>
                                 </ul>
                             </div>
 
@@ -77,7 +81,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
                                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '14px' }}>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Newsroom</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">New features</a></li>
-                                    <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Careers</a></li>
+                                    <li><Link href="/careers" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Careers</Link></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Investors</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Gift cards</a></li>
                                     <li><a href="#" style={{ color: '#222222', textDecoration: 'none' }} className="hover:underline">Airbnb.org emergency stays</a></li>
