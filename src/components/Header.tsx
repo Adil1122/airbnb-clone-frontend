@@ -1,20 +1,26 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail, HelpCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
+import { Search, Globe, Menu, UserCircle, Command, Facebook, Apple, Mail, HelpCircle, MapPin, Calendar, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Modal from './Modal';
 
-const Header: React.FC = () => {
+const HeaderContent: React.FC = () => {
     const [isHostModalOpen, setIsHostModalOpen] = useState(false);
     const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const [activeLanguageTab, setActiveLanguageTab] = useState<'language' | 'currency'>('language');
+    const [isWhereDropdownOpen, setIsWhereDropdownOpen] = useState(false);
+    const [isWhenDropdownOpen, setIsWhenDropdownOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const menuRef = useRef<HTMLDivElement>(null);
+    const whereDropdownRef = useRef<HTMLDivElement>(null);
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const isSearchPage = pathname === '/search';
+    const activeTab = searchParams.get('tab') || 'homes';
 
     useEffect(() => {
         const handleOpenAuth = () => setIsAuthModalOpen(true);
@@ -23,6 +29,10 @@ const Header: React.FC = () => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
                 setIsUserMenuOpen(false);
+            }
+            if (whereDropdownRef.current && !whereDropdownRef.current.contains(event.target as Node)) {
+                setIsWhereDropdownOpen(false);
+                setIsWhenDropdownOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -53,15 +63,21 @@ const Header: React.FC = () => {
                     {/* Navigation Tabs */}
                     {!isSearchPage && (
                         <div className="nav-tabs desktop-only" style={{ display: 'flex', gap: '24px', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
-                            <div className="nav-tab active" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: '2px solid #222222' }}>
-                                <span style={{ color: '#222222', fontSize: '16px', fontWeight: 600 }}>Homes</span>
-                            </div>
-                            <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
-                                <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Experiences</span>
-                            </div>
-                            <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0' }}>
-                                <span style={{ color: '#717171', fontSize: '16px', fontWeight: 400 }}>Services</span>
-                            </div>
+                            <Link href="/" style={{ textDecoration: 'none' }}>
+                                <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: activeTab === 'homes' ? '2px solid #222222' : '2px solid transparent' }}>
+                                    <span style={{ color: activeTab === 'homes' ? '#222222' : '#717171', fontSize: '16px', fontWeight: activeTab === 'homes' ? 600 : 400 }}>Homes</span>
+                                </div>
+                            </Link>
+                            <Link href="/?tab=experiences" style={{ textDecoration: 'none' }}>
+                                <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: activeTab === 'experiences' ? '2px solid #222222' : '2px solid transparent' }}>
+                                    <span style={{ color: activeTab === 'experiences' ? '#222222' : '#717171', fontSize: '16px', fontWeight: activeTab === 'experiences' ? 600 : 400 }}>Experiences</span>
+                                </div>
+                            </Link>
+                            <Link href="/?tab=services" style={{ textDecoration: 'none' }}>
+                                <div className="nav-tab" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 0', borderBottom: activeTab === 'services' ? '2px solid #222222' : '2px solid transparent' }}>
+                                    <span style={{ color: activeTab === 'services' ? '#222222' : '#717171', fontSize: '16px', fontWeight: activeTab === 'services' ? 600 : 400 }}>Services</span>
+                                </div>
+                            </Link>
                         </div>
                     )}
 
@@ -464,27 +480,85 @@ const Header: React.FC = () => {
                 {/* Search Bar */}
                 {!isSearchPage && (
                     <div className="search-container">
-                        <Link href="/search" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', width: '100%', justifyContent: 'center' }}>
-                            <div className="search-bar-full">
-                                <div className="search-item">
-                                    <span className="search-label">Where</span>
-                                    <span className="search-value" style={{ fontSize: '14px' }}>Search destinations</span>
-                                </div>
-                                <div className="search-divider desktop-only"></div>
-                                <div className="search-item desktop-only">
-                                    <span className="search-label">When</span>
-                                    <span className="search-value">Add dates</span>
-                                </div>
-                                <div className="search-divider desktop-only"></div>
-                                <div className="search-item desktop-only">
-                                    <span className="search-label">Who</span>
-                                    <span className="search-value">Add guests</span>
-                                </div>
+                        <div className="search-bar-full" ref={whereDropdownRef} style={{ position: 'relative' }}>
+                            <div
+                                className="search-item"
+                                onClick={() => { setIsWhereDropdownOpen(true); setIsWhenDropdownOpen(false); }}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <span className="search-label">Where</span>
+                                <input
+                                    type="text"
+                                    className="search-value"
+                                    placeholder="Search destinations"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onFocus={() => setIsWhereDropdownOpen(true)}
+                                    style={{
+                                        fontSize: '14px',
+                                        border: 'none',
+                                        outline: 'none',
+                                        background: 'transparent',
+                                        width: '180px',
+                                        color: '#222222'
+                                    }}
+                                />
+                            </div>
+                            <div className="search-divider desktop-only"></div>
+                            <div
+                                className="search-item desktop-only"
+                                onClick={() => { setIsWhenDropdownOpen(true); setIsWhereDropdownOpen(false); }}
+                                style={{ cursor: 'pointer' }}
+                            >
+                                <span className="search-label">When</span>
+                                <span className="search-value">Add dates</span>
+                            </div>
+                            <div className="search-divider desktop-only"></div>
+                            <div className="search-item desktop-only">
+                                <span className="search-label">Who</span>
+                                <span className="search-value">Add guests</span>
+                            </div>
+                            <Link href="/search" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
                                 <button className="search-btn-red">
                                     <Search size={18} strokeWidth={2.5} />
                                 </button>
-                            </div>
-                        </Link>
+                            </Link>
+
+                            {/* Where Dropdown */}
+                            {isWhereDropdownOpen && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '70px',
+                                    left: '0',
+                                    width: '430px',
+                                    backgroundColor: 'white',
+                                    borderRadius: '32px',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+                                    padding: '16px',
+                                    zIndex: 1000,
+                                    maxHeight: '480px',
+                                    overflowY: 'auto'
+                                }}>
+                                    <WhereDropdown searchQuery={searchQuery} onClose={() => setIsWhereDropdownOpen(false)} />
+                                </div>
+                            )}
+
+                            {/* When Dropdown */}
+                            {isWhenDropdownOpen && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '70px',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    backgroundColor: 'white',
+                                    borderRadius: '32px',
+                                    boxShadow: '0 8px 28px rgba(0,0,0,0.15)',
+                                    zIndex: 1000,
+                                }}>
+                                    <WhenDropdown onClose={() => setIsWhenDropdownOpen(false)} />
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -559,5 +633,457 @@ const HostOption = ({ icon, label }: { icon: React.ReactNode, label: string }) =
         `}</style>
     </div>
 );
+
+interface Destination {
+    id: string;
+    name: string;
+    region: string;
+    imageUrl: string;
+    type: 'region' | 'city';
+}
+
+const SUGGESTED_DESTINATIONS: Destination[] = [
+    { id: '1', name: 'Bangkok', region: 'Thailand', imageUrl: 'https://images.unsplash.com/photo-1508009603885-50cf7c579365?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '2', name: 'Phuket', region: 'Thailand', imageUrl: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '3', name: 'Chiang Mai', region: 'Thailand', imageUrl: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '4', name: 'Dubai', region: 'United Arab Emirates', imageUrl: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '5', name: 'Paris', region: 'France', imageUrl: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '6', name: 'New York', region: 'United States', imageUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '7', name: 'Tokyo', region: 'Japan', imageUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '8', name: 'London', region: 'United Kingdom', imageUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '9', name: 'Barcelona', region: 'Spain', imageUrl: 'https://images.unsplash.com/photo-1583422409516-2895a77efded?auto=format&fit=crop&w=100&q=80', type: 'city' },
+    { id: '10', name: 'Bali', region: 'Indonesia', imageUrl: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=100&q=80', type: 'city' },
+];
+
+const REGIONS: Destination[] = [
+    { id: 'r1', name: "I'm flexible", region: '', imageUrl: '', type: 'region' },
+    { id: 'r2', name: 'Europe', region: '', imageUrl: '', type: 'region' },
+    { id: 'r3', name: 'Southeast Asia', region: '', imageUrl: '', type: 'region' },
+    { id: 'r4', name: 'United States', region: '', imageUrl: '', type: 'region' },
+    { id: 'r5', name: 'Middle East', region: '', imageUrl: '', type: 'region' },
+    { id: 'r6', name: 'Asia Pacific', region: '', imageUrl: '', type: 'region' },
+];
+
+const WhereDropdown = ({ searchQuery, onClose }: { searchQuery: string; onClose: () => void }) => {
+    const router = require('next/navigation').useRouter();
+
+    const filteredDestinations = searchQuery.length > 0
+        ? SUGGESTED_DESTINATIONS.filter(d =>
+            d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            d.region.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        : SUGGESTED_DESTINATIONS.slice(0, 6);
+
+    const handleSelect = (destination: Destination) => {
+        onClose();
+        router.push(`/search?location=${encodeURIComponent(destination.name)}`);
+    };
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {searchQuery.length === 0 && (
+                <>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {REGIONS.map(region => (
+                            <button
+                                key={region.id}
+                                onClick={() => handleSelect(region)}
+                                style={{
+                                    padding: '8px 14px',
+                                    borderRadius: '20px',
+                                    border: '1px solid #DDDDDD',
+                                    backgroundColor: 'white',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: 500,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    transition: 'all 0.2s'
+                                }}
+                                className="region-btn"
+                            >
+                                <MapPin size={12} />
+                                {region.name}
+                            </button>
+                        ))}
+                    </div>
+                    <div style={{ height: '1px', backgroundColor: '#EBEBEB', margin: '4px 0' }} />
+                </>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                <p style={{ fontSize: '12px', fontWeight: 600, color: '#717171', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    {searchQuery.length > 0 ? 'Destinations' : 'Popular destinations'}
+                </p>
+
+                {filteredDestinations.length > 0 ? (
+                    filteredDestinations.map(destination => (
+                        <div
+                            key={destination.id}
+                            onClick={() => handleSelect(destination)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '14px',
+                                padding: '10px 12px',
+                                borderRadius: '12px',
+                                cursor: 'pointer',
+                                transition: 'background 0.2s'
+                            }}
+                            className="destination-item"
+                        >
+                            {destination.imageUrl && (
+                                <img
+                                    src={destination.imageUrl}
+                                    alt={destination.name}
+                                    style={{
+                                        width: '56px',
+                                        height: '56px',
+                                        borderRadius: '10px',
+                                        objectFit: 'cover'
+                                    }}
+                                />
+                            )}
+                            {!destination.imageUrl && (
+                                <div style={{
+                                    width: '56px',
+                                    height: '56px',
+                                    borderRadius: '10px',
+                                    backgroundColor: '#F7F7F7',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <MapPin size={20} color="#717171" />
+                                </div>
+                            )}
+                            <div>
+                                <p style={{ fontSize: '15px', fontWeight: 600, color: '#222222', margin: 0 }}>{destination.name}</p>
+                                <p style={{ fontSize: '13px', color: '#717171', margin: '2px 0 0 0' }}>{destination.region}</p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div style={{ padding: '20px', textAlign: 'center', color: '#717171', fontSize: '14px' }}>
+                        No destinations found for "{searchQuery}"
+                    </div>
+                )}
+            </div>
+
+            <style jsx>{`
+                .destination-item:hover {
+                    background-color: #F7F7F7;
+                }
+                .region-btn:hover {
+                    border-color: #222222;
+                }
+            `}</style>
+        </div>
+    );
+};
+
+const WhenDropdown = ({ onClose }: { onClose: () => void }) => {
+    const [activeTab, setActiveTab] = useState<'dates' | 'months' | 'flexible'>('flexible');
+    const [duration, setDuration] = useState<'weekend' | 'week' | 'month'>('week');
+
+    return (
+        <div style={{ padding: '32px', display: 'flex', flexDirection: 'column', width: '850px' }}>
+            {/* Tabs */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '32px' }}>
+                <div style={{ background: '#EBEBEB', borderRadius: '32px', display: 'flex', padding: '4px' }}>
+                    <button
+                        onClick={() => setActiveTab('dates')}
+                        style={{ background: activeTab === 'dates' ? 'white' : 'transparent', borderRadius: '24px', padding: '8px 24px', border: activeTab === 'dates' ? '1px solid #DDDDDD' : '1px solid transparent', boxShadow: activeTab === 'dates' ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', fontWeight: 600, fontSize: '14px', cursor: 'pointer', color: '#222222' }}
+                    >Dates</button>
+                    <button
+                        onClick={() => setActiveTab('months')}
+                        style={{ background: activeTab === 'months' ? 'white' : 'transparent', border: activeTab === 'months' ? '1px solid #DDDDDD' : '1px solid transparent', boxShadow: activeTab === 'months' ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', borderRadius: '24px', padding: '8px 24px', fontWeight: 600, fontSize: '14px', color: '#222222', cursor: 'pointer' }}
+                    >Months</button>
+                    <button
+                        onClick={() => setActiveTab('flexible')}
+                        style={{ background: activeTab === 'flexible' ? 'white' : 'transparent', border: activeTab === 'flexible' ? '1px solid #DDDDDD' : '1px solid transparent', boxShadow: activeTab === 'flexible' ? '0 1px 2px rgba(0,0,0,0.08)' : 'none', borderRadius: '24px', padding: '8px 24px', fontWeight: 600, fontSize: '14px', color: '#222222', cursor: 'pointer' }}
+                    >Flexible</button>
+                </div>
+            </div>
+
+            {/* Dates Content */}
+            <div style={{ display: activeTab === 'dates' ? 'block' : 'none' }}>
+                {/* Calendars */}
+                <div style={{ display: 'flex', gap: '48px', justifyContent: 'center', marginBottom: '24px', padding: '0 16px' }}>
+                    {/* Left Calendar : March 2026 */}
+                    <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: '24px', alignItems: 'center' }}>
+                            <button style={{ position: 'absolute', left: 0, background: 'transparent', border: 'none', cursor: 'not-allowed', color: '#DDDDDD', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', height: '12px', width: '12px', fill: 'currentColor' }}><path d="M20 28 8.7 16.7a1 1 0 0 1 0-1.4L20 4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                            </button>
+                            <strong style={{ fontSize: '16px', fontWeight: 600, color: '#222222' }}>March 2026</strong>
+                        </div>
+                        {/* Days of week */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: '16px' }}>
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                                <div key={i} style={{ fontSize: '12px', color: '#717171', fontWeight: 600 }}>{d}</div>
+                            ))}
+                        </div>
+                        {/* Days grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', gap: '2px' }}>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
+                                <div key={`mar-${day}`} style={{
+                                    height: '48px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '14px',
+                                    fontWeight: day >= 24 ? 600 : 400,
+                                    color: day >= 24 ? '#222222' : '#DDDDDD',
+                                    cursor: day >= 24 ? 'pointer' : 'default',
+                                    borderRadius: '50%'
+                                }}
+                                    className={day >= 24 ? 'calendar-day' : ''}>
+                                    {day}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Right Calendar : April 2026 */}
+                    <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', justifyContent: 'center', position: 'relative', marginBottom: '24px', alignItems: 'center' }}>
+                            <strong style={{ fontSize: '16px', fontWeight: 600, color: '#222222' }}>April 2026</strong>
+                            <button style={{ position: 'absolute', right: 0, background: 'transparent', border: 'none', cursor: 'pointer', color: '#222222', padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', height: '12px', width: '12px', fill: 'currentColor' }}><path d="M12 4l11.3 11.3a1 1 0 0 1 0 1.4L12 28" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"></path></svg>
+                            </button>
+                        </div>
+                        {/* Days of week */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', marginBottom: '16px' }}>
+                            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
+                                <div key={i} style={{ fontSize: '12px', color: '#717171', fontWeight: 600 }}>{d}</div>
+                            ))}
+                        </div>
+                        {/* Days grid */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', textAlign: 'center', gap: '2px' }}>
+                            {/* Empty cells for April (Starts on Wednesday) */}
+                            <div style={{ height: '48px' }}></div>
+                            <div style={{ height: '48px' }}></div>
+                            <div style={{ height: '48px' }}></div>
+                            {Array.from({ length: 30 }, (_, i) => i + 1).map(day => (
+                                <div key={`apr-${day}`} style={{
+                                    height: '48px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    color: '#222222',
+                                    cursor: 'pointer',
+                                    borderRadius: '50%'
+                                }}
+                                    className="calendar-day">
+                                    {day}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Bottom Options / Pills */}
+                <div style={{ display: 'flex', gap: '12px', alignSelf: 'flex-start' }}>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #222222', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>Exact dates</button>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #DDDDDD', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>± 1 day</button>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #DDDDDD', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>± 2 days</button>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #DDDDDD', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>± 3 days</button>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #DDDDDD', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>± 7 days</button>
+                    <button style={{ padding: '8px 16px', borderRadius: '32px', border: '1px solid #DDDDDD', background: 'white', color: '#222222', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}>± 14 days</button>
+                </div>
+            </div>
+
+            {/* Months Content */}
+            {activeTab === 'months' && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <h2 style={{ fontSize: '22px', fontWeight: 600, color: '#222222', margin: '0 0 32px 0' }}>When's your trip?</h2>
+
+                    {/* Circular UI */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '60px' }}>
+                        <svg width="320" height="320" viewBox="0 0 320 320">
+                            <defs>
+                                <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="16" result="blur" />
+                                    <feComponentTransfer in="blur" result="glow">
+                                        <feFuncA type="linear" slope="0.8" />
+                                    </feComponentTransfer>
+                                    <feMerge>
+                                        <feMergeNode in="glow" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <linearGradient id="redGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#ff385c" />
+                                    <stop offset="100%" stopColor="#d70566" />
+                                </linearGradient>
+                                <filter id="shadow">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1" />
+                                </filter>
+                                <filter id="shadowHandle">
+                                    <feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.25" />
+                                </filter>
+                            </defs>
+
+                            {/* Outer ring shadow */}
+                            <circle cx="160" cy="160" r="100" fill="none" stroke="#f0f0f0" strokeWidth="56" filter="url(#shadow)" />
+
+                            {/* Background Ring */}
+                            <circle cx="160" cy="160" r="100" fill="none" stroke="#f7f7f7" strokeWidth="56" />
+
+                            {/* 12 dots */}
+                            {Array.from({ length: 12 }).map((_, i) => {
+                                const angle = (i * 30 - 90) * (Math.PI / 180);
+                                const cx = 160 + 100 * Math.cos(angle);
+                                const cy = 160 + 100 * Math.sin(angle);
+                                return <circle key={i} cx={cx} cy={cy} r="2.5" fill="#c0c0c0" />;
+                            })}
+
+                            {/* Inner white circle shadow */}
+                            <circle cx="160" cy="160" r="68" fill="#ffffff" filter="url(#shadow)" />
+
+                            {/* Red Arc outer glow */}
+                            <path d="M 160 60 A 100 100 0 0 1 246.60 210" fill="none" stroke="#ff385c" strokeWidth="56" strokeLinecap="butt" filter="url(#glow)" opacity="0.4" />
+
+                            {/* Red solid Arc */}
+                            <path d="M 160 60 A 100 100 0 0 1 246.60 210" fill="none" stroke="url(#redGrad)" strokeWidth="56" strokeLinecap="butt" />
+
+                            {/* White handle */}
+                            <circle cx="246.60" cy="210" r="14.5" fill="#ffffff" filter="url(#shadowHandle)" />
+
+                            {/* Text inside the white circle */}
+                            <circle cx="160" cy="160" r="68" fill="#ffffff" />
+                            <text x="160" y="150" textAnchor="middle" dominantBaseline="middle" alignmentBaseline="middle" fontSize="72" fontWeight="800" fill="#222222" letterSpacing="-2" style={{ fontFamily: 'inherit' }}>4</text>
+                            <text x="160" y="195" textAnchor="middle" dominantBaseline="middle" alignmentBaseline="middle" fontSize="16" fontWeight="600" fill="#222222" style={{ fontFamily: 'inherit' }}>months</text>
+                        </svg>
+                    </div>
+
+                    {/* Bottom Selected Dates */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '15px', color: '#222222' }}>
+                        <span style={{ borderBottom: '1px solid #222222', fontWeight: 600, paddingBottom: '2px' }}>Wed, Apr 1</span>
+                        <span style={{ margin: '0 4px' }}>to</span>
+                        <span style={{ borderBottom: '1px solid #222222', fontWeight: 600, paddingBottom: '2px' }}>Sat, Aug 1</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Flexible Content */}
+            {activeTab === 'flexible' && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: '0 16px' }}>
+                    <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#222222', margin: '0 0 24px 0' }}>How long would you like to stay?</h3>
+
+                    {/* Duration Options */}
+                    <div style={{ display: 'flex', gap: '12px', marginBottom: '40px' }}>
+                        {['Weekend', 'Week', 'Month'].map((opt) => (
+                            <button
+                                key={opt}
+                                onClick={() => setDuration(opt.toLowerCase() as any)}
+                                style={{
+                                    padding: '10px 24px',
+                                    borderRadius: '24px',
+                                    border: duration === opt.toLowerCase() ? '2px solid #222222' : '1px solid #DDDDDD',
+                                    background: duration === opt.toLowerCase() ? '#F7F7F7' : 'white',
+                                    color: '#222222',
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {opt}
+                            </button>
+                        ))}
+                    </div>
+
+                    <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#222222', margin: '0 0 24px 0' }}>Go anytime</h3>
+
+                    {/* Month Cards Row */}
+                    <div style={{ position: 'relative', width: '100%', overflow: 'visible' }}>
+                        <div style={{ display: 'flex', gap: '12px', overflowX: 'hidden', padding: '4px' }}>
+                            {[
+                                { name: 'April', year: '2026' },
+                                { name: 'May', year: '2026' },
+                                { name: 'June', year: '2026' },
+                                { name: 'July', year: '2026' },
+                                { name: 'August', year: '2026' },
+                                { name: 'September', year: '2026' },
+                            ].map((month, i) => (
+                                <div
+                                    key={i}
+                                    style={{
+                                        minWidth: '120px',
+                                        flex: '1',
+                                        aspectRatio: '1',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        border: '1px solid #DDDDDD',
+                                        borderRadius: '16px',
+                                        padding: '16px',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s',
+                                        backgroundColor: 'white'
+                                    }}
+                                    className="month-card"
+                                >
+                                    <Calendar size={32} strokeWidth={1} style={{ marginBottom: '12px', color: '#222222' }} />
+                                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#222222' }}>{month.name}</span>
+                                    <span style={{ fontSize: '12px', color: '#717171' }}>{month.year}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Scroll Button */}
+                        <button style={{
+                            position: 'absolute',
+                            right: '-16px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            width: '32px',
+                            height: '32px',
+                            borderRadius: '50%',
+                            background: 'white',
+                            border: '1px solid #DDDDDD',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                            zIndex: 10
+                        }}>
+                            <ChevronRight size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <style jsx>{`
+                .calendar-day {
+                    transition: border 0.1s;
+                    border: 1px solid transparent;
+                }
+                .calendar-day:hover {
+                    border-color: #222222;
+                }
+                .month-card:hover {
+                    border-color: #222222;
+                    box-shadow: 0 0 0 1px #222222;
+                }
+            `}</style>
+        </div>
+    );
+};
+
+const Header: React.FC = () => {
+    return (
+        <Suspense fallback={null}>
+            <HeaderContent />
+        </Suspense>
+    );
+};
 
 export default Header;
